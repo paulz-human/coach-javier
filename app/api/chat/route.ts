@@ -35,13 +35,14 @@ export async function POST(req: NextRequest) {
       .limit(20),
   ]);
 
-  if (!profileResult.data) {
+  const profile = profileResult.data as NonNullable<typeof profileResult.data>;
+  if (!profile) {
     return new Response("Profile not found", { status: 404 });
   }
 
   const systemPrompt = buildSystemPrompt(
-    profileResult.data,
-    sessionsResult.data ?? []
+    profile,
+    (sessionsResult.data ?? []) as NonNullable<typeof sessionsResult.data>
   );
 
   // Reverse history so it's chronological, then append the new message
