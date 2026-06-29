@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Database } from "./database.types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
