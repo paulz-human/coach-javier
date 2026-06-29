@@ -28,51 +28,54 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-dvh px-6 pt-20 pb-10" style={{ background: "var(--bg)" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100dvh", background: "#fff", padding: "0 24px" }}>
+
       {/* Logo */}
-      <div
-        className="w-16 h-16 rounded-3xl flex items-center justify-center text-2xl font-black text-white mb-8"
-        style={{ background: "var(--accent)", boxShadow: "0 8px 24px rgba(29,185,84,0.3)" }}
-      >
-        J
+      <div style={{ paddingTop: 72, marginBottom: 32 }}>
+        <div style={{
+          width: 64, height: 64, borderRadius: 20,
+          background: "#1db954", display: "flex", alignItems: "center",
+          justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: 28,
+          boxShadow: "0 8px 24px rgba(29,185,84,0.3)",
+        }}>J</div>
       </div>
 
-      <h1 className="text-4xl font-black mb-2" style={{ color: "var(--fg)" }}>Coach Javier</h1>
-      <p className="text-base mb-10 leading-relaxed" style={{ color: "var(--fg-muted)" }}>
+      <h1 style={{ fontSize: 36, fontWeight: 900, color: "#111", marginBottom: 8, lineHeight: 1.1 }}>
+        Coach Javier
+      </h1>
+      <p style={{ fontSize: 16, color: "#888", marginBottom: 40, lineHeight: 1.6 }}>
         Ton coach running personnel.<br />Connecte-toi pour commencer.
       </p>
 
-      <div className="flex flex-col gap-3">
-        <input
-          type="email"
-          placeholder="ton@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-2xl px-5 py-4 text-base outline-none"
-          style={{
-            background: "var(--surface)",
-            color: "var(--fg)",
-            border: "1.5px solid var(--border)",
-          }}
-          autoFocus
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-          className="w-full rounded-2xl px-5 py-4 text-base outline-none"
-          style={{
-            background: "var(--surface)",
-            color: "var(--fg)",
-            border: "1.5px solid var(--border)",
-          }}
-        />
-      </div>
+      <input
+        type="email"
+        placeholder="ton@email.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        style={{
+          width: "100%", borderRadius: 16, padding: "14px 18px",
+          fontSize: 16, outline: "none", marginBottom: 12,
+          background: "#f2f2f0", color: "#111",
+          border: "1.5px solid #ebebeb", fontFamily: "inherit",
+        }}
+        autoFocus
+      />
+      <input
+        type="password"
+        placeholder="Mot de passe"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+        style={{
+          width: "100%", borderRadius: 16, padding: "14px 18px",
+          fontSize: 16, outline: "none", marginBottom: 8,
+          background: "#f2f2f0", color: "#111",
+          border: "1.5px solid #ebebeb", fontFamily: "inherit",
+        }}
+      />
 
       {error && (
-        <p className="text-sm mt-3 font-medium" style={{ color: "#ef4444" }}>
+        <p style={{ fontSize: 14, color: "#ef4444", marginBottom: 12, fontWeight: 500 }}>
           {error}
         </p>
       )}
@@ -80,11 +83,13 @@ export default function LoginPage() {
       <button
         onClick={handleLogin}
         disabled={!email.trim() || !password.trim() || loading}
-        className="w-full py-4 rounded-2xl font-bold text-base mt-5 transition-all disabled:opacity-30"
         style={{
-          background: "var(--accent)",
-          color: "#fff",
+          width: "100%", padding: "16px", borderRadius: 18,
+          fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer",
+          background: "#1db954", color: "#fff", marginTop: 8,
           boxShadow: "0 4px 20px rgba(29,185,84,0.3)",
+          opacity: (!email.trim() || !password.trim() || loading) ? 0.35 : 1,
+          fontFamily: "inherit",
         }}
       >
         {loading ? "Connexion..." : "Se connecter"}
