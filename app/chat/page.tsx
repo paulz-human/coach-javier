@@ -18,8 +18,8 @@ const QUICK_REPLIES = [
 
 function cleanContent(text: string): string {
   return text
-    .replace(/<log_session>.*?<\/log_session>/gs, "")
-    .replace(/<plan_session>.*?<\/plan_session>/gs, "")
+    .replace(/<log_session>[\s\S]*?<\/log_session>/g, "")
+    .replace(/<plan_session>[\s\S]*?<\/plan_session>/g, "")
     .trim();
 }
 
