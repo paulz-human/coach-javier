@@ -8,6 +8,8 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { data: profile } = await supabase.from("profiles").select("name").eq("id", user.id).single();
+
   const { data: sessions } = await supabase
     .from("sessions")
     .select("*")
@@ -50,7 +52,9 @@ export default async function DashboardPage() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: "#111" }}>Mes stats</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: "#111" }}>
+            Stats de {profile?.name ?? "ton compte"}
+          </h1>
           <p style={{ fontSize: 14, color: "#888", marginTop: 2 }}>Historique de tes séances</p>
         </div>
         <Link href="/chat" style={{
