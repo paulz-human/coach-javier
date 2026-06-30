@@ -2,28 +2,32 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const supabase = createClient();
-  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleLogin() {
-    if (!email.trim() || !password.trim()) return;
+    if (!email.trim()) return;
     setLoading(true);
     setError("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        shouldCreateUser: true,
+      },
+    });
     if (error) {
-      setError("Email ou mot de passe incorrect.");
+      setError("Une erreur est survenue. Réessaie.");
       setLoading(false);
     } else {
-      router.push("/");
-      router.refresh();
+      setSent(true);
+      setLoading(false);
     }
   }
 
@@ -44,56 +48,77 @@ export default function LoginPage() {
         Coach Javier
       </h1>
       <p style={{ fontSize: 16, color: "#888", marginBottom: 40, lineHeight: 1.6 }}>
-        Ton coach running personnel.<br />Connecte-toi pour commencer.
+        Ton coach running personnel.<br />Inscris-toi ou connecte-toi.
       </p>
 
-      <input
-        type="email"
-        placeholder="ton@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{
-          width: "100%", borderRadius: 16, padding: "14px 18px",
-          fontSize: 16, outline: "none", marginBottom: 12,
-          background: "#f2f2f0", color: "#111",
-          border: "1.5px solid #ebebeb", fontFamily: "inherit",
-        }}
-        autoFocus
-      />
-      <input
-        type="password"
-        placeholder="Mot de passe"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-        style={{
-          width: "100%", borderRadius: 16, padding: "14px 18px",
-          fontSize: 16, outline: "none", marginBottom: 8,
-          background: "#f2f2f0", color: "#111",
-          border: "1.5px solid #ebebeb", fontFamily: "inherit",
-        }}
-      />
+      {sent ? (
+        <div style={{
+          background: "#e8f8ee", borderRadius: 20, padding: "24px 20px",
+          border: "1.5px solid #1db954",
+        }}>
+          <div style={{ fontSize: 28, marginBottom: 12 }}>📬</div>
+          <p style={{ fontWeight: 700, fontSize: 16, color: "#111", marginBottom: 6 }}>
+            Vérifie ta boîte mail
+          </p>
+          <p style={{ fontSize: 14, color: "#555", lineHeight: 1.6 }}>
+            Un lien magique a été envoyé à <strong>{email}</strong>.<br />
+            Clique dessus pour accéder à Coach Javier.
+          </p>
+          <button
+            onClick={() => { setSent(false); setEmail(""); }}
+            style={{
+              marginTop: 16, fontSize: 13, color: "#1db954", background: "none",
+              border: "none", cursor: "pointer", fontWeight: 600, padding: 0,
+              fontFamily: "inherit",
+            }}
+          >
+            Utiliser un autre email →
+          </button>
+        </div>
+      ) : (
+        <>
+          <input
+            type="email"
+            placeholder="ton@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+            style={{
+              width: "100%", borderRadius: 16, padding: "14px 18px",
+              fontSize: 16, outline: "none", marginBottom: 12,
+              background: "#f2f2f0", color: "#111",
+              border: "1.5px solid #ebebeb", fontFamily: "inherit",
+            }}
+            autoFocus
+          />
 
-      {error && (
-        <p style={{ fontSize: 14, color: "#ef4444", marginBottom: 12, fontWeight: 500 }}>
-          {error}
-        </p>
+          {error && (
+            <p style={{ fontSize: 14, color: "#ef4444", marginBottom: 12, fontWeight: 500 }}>
+              {error}
+            </p>
+          )}
+
+          <button
+            onClick={handleLogin}
+            disabled={!email.trim() || loading}
+            style={{
+              width: "100%", padding: "16px", borderRadius: 18,
+              fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer",
+              background: "#1db954", color: "#fff",
+              boxShadow: "0 4px 20px rgba(29,185,84,0.3)",
+              opacity: (!email.trim() || loading) ? 0.35 : 1,
+              fontFamily: "inherit",
+            }}
+          >
+            {loading ? "Envoi en cours..." : "Recevoir le lien magique ✨"}
+          </button>
+
+          <p style={{ fontSize: 12, color: "#aaa", textAlign: "center", marginTop: 16, lineHeight: 1.6 }}>
+            Pas de mot de passe — on t'envoie un lien par email.<br />
+            Première fois ? Ton compte est créé automatiquement.
+          </p>
+        </>
       )}
-
-      <button
-        onClick={handleLogin}
-        disabled={!email.trim() || !password.trim() || loading}
-        style={{
-          width: "100%", padding: "16px", borderRadius: 18,
-          fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer",
-          background: "#1db954", color: "#fff", marginTop: 8,
-          boxShadow: "0 4px 20px rgba(29,185,84,0.3)",
-          opacity: (!email.trim() || !password.trim() || loading) ? 0.35 : 1,
-          fontFamily: "inherit",
-        }}
-      >
-        {loading ? "Connexion..." : "Se connecter"}
-      </button>
     </div>
   );
 }
