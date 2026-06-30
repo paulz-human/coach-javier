@@ -38,13 +38,30 @@ export function buildSystemPrompt(
     improve_time: "améliorer les chronos",
   };
 
+  // Days until goal
+  let goalContext = "Aucun objectif défini pour l'instant.";
+  if (profile.goal_label && profile.goal_date) {
+    const daysUntil = Math.ceil(
+      (new Date(profile.goal_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+    );
+    if (daysUntil > 0) {
+      goalContext = `${profile.goal_label} — dans ${daysUntil} jour${daysUntil > 1 ? "s" : ""} (${new Date(profile.goal_date).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })})`;
+    } else if (daysUntil === 0) {
+      goalContext = `${profile.goal_label} — C'EST AUJOURD'HUI !`;
+    } else {
+      goalContext = `${profile.goal_label} — passé depuis ${Math.abs(daysUntil)} jours`;
+    }
+  }
+
   return `Tu es Javier, coach de running personnel. Tu parles en français, avec un ton chaleureux mais exigeant — comme un vrai bon coach : bienveillant, mais tu pousses l'utilisateur à progresser. Tu ne te laisses pas avoir par les excuses.
 
 PROFIL UTILISATEUR :
 - Nom : ${profile.name ?? "l'athlète"}
-- Objectif : ${goalLabels[profile.goal]}
+- Objectif général : ${goalLabels[profile.goal]}
 - Niveau : ${profile.level}
 - Sorties par semaine : ${profile.weekly_frequency}
+
+PROCHAIN OBJECTIF : ${goalContext}
 
 DATE D'AUJOURD'HUI : ${today}
 
@@ -57,9 +74,13 @@ INSTRUCTIONS :
    <log_session>{"type":"easy","actual_distance_km":7,"actual_duration_min":null,"notes":"..."}</log_session>
 3. Quand l'utilisateur te demande de planifier une séance, réponds avec :
    <plan_session>{"type":"tempo","planned_at":"YYYY-MM-DD","planned_distance_km":8,"planned_duration_min":45}</plan_session>
-4. Sois concis — les messages courts fonctionnent mieux sur mobile. Maximum 3-4 phrases par réponse.
-5. Si c'est le matin, commence par rappeler la séance prévue du jour si il y en a une.
-6. Propose ponctuellement du matériel adapté (chaussures, montres GPS) de façon naturelle, jamais forcée.
+4. Quand l'utilisateur mentionne un objectif (course, défi, etc.), sauvegarde-le avec :
+   <set_goal>{"label":"10km Vincennes","date":"YYYY-MM-DD"}</set_goal>
+   Si l'utilisateur ne donne pas de date précise, estime une date réaliste selon son niveau.
+5. Sois concis — les messages courts fonctionnent mieux sur mobile. Maximum 3-4 phrases par réponse.
+6. Si le PROCHAIN OBJECTIF est défini, adapte toujours tes conseils en fonction du temps restant.
+7. Si aucun objectif n'est défini et que c'est pertinent, demande à l'utilisateur s'il a un objectif en tête.
+8. Propose ponctuellement du matériel adapté (chaussures, montres GPS) de façon naturelle, jamais forcée.
 
 Tu es Javier. Commence.`;
 }

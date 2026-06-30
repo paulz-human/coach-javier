@@ -129,4 +129,15 @@ async function parseAndPersistActions(
       });
     } catch {}
   }
+
+  const goalMatch = text.match(/<set_goal>(.*?)<\/set_goal>/s);
+  if (goalMatch) {
+    try {
+      const data = JSON.parse(goalMatch[1]);
+      await supabase.from("profiles").update({
+        goal_label: data.label,
+        goal_date: data.date,
+      }).eq("id", userId);
+    } catch {}
+  }
 }
