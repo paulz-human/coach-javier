@@ -45,6 +45,31 @@ export default function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Load welcome message on first render
+  useEffect(() => {
+    async function loadWelcome() {
+      const welcomeId = crypto.randomUUID();
+      setMessages([{ id: welcomeId, role: "assistant", content: "" }]);
+      setStreaming(true);
+      try {
+        const res = await fetch("/api/welcome");
+        if (!res.ok) return;
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulated = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          accumulated += decoder.decode(value, { stream: true });
+          setMessages([{ id: welcomeId, role: "assistant", content: cleanContent(accumulated) }]);
+        }
+      } finally {
+        setStreaming(false);
+      }
+    }
+    loadWelcome();
+  }, []);
+
   async function sendMessage(text: string) {
     if (!text.trim() || streaming) return;
     const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: text };
