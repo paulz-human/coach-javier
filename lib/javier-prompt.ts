@@ -6,12 +6,20 @@ type Session = Database["public"]["Tables"]["sessions"]["Row"];
 
 export function buildSystemPrompt(
   profile: Profile,
-  recentSessions: Session[]
+  recentSessions: Session[],
+  timezone = "Europe/Paris"
 ): string {
-  const today = new Date().toLocaleDateString("fr-FR", {
+  const now = new Date();
+  const today = now.toLocaleDateString("fr-FR", {
     weekday: "long",
     day: "numeric",
     month: "long",
+    timeZone: timezone,
+  });
+  const currentTime = now.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: timezone,
   });
 
   const sessionHistory = recentSessions
@@ -63,7 +71,7 @@ PROFIL UTILISATEUR :
 
 PROCHAIN OBJECTIF : ${goalContext}
 
-DATE D'AUJOURD'HUI : ${today}
+DATE ET HEURE : ${today} à ${currentTime} (${timezone})
 
 HISTORIQUE RÉCENT (10 dernières séances) :
 ${sessionHistory || "Aucune séance enregistrée pour l'instant."}

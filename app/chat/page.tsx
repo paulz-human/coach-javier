@@ -85,7 +85,10 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({
+          message: text,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
       });
       if (!res.ok) throw new Error("Failed");
       const reader = res.body!.getReader();

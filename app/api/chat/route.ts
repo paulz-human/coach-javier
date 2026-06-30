@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { message } = await req.json();
+  const { message, timezone } = await req.json();
   if (!message?.trim()) {
     return new Response("Message required", { status: 400 });
   }
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const history = (historyResult.data ?? []) as any[];
 
-  const systemPrompt = buildSystemPrompt(profile, sessions);
+  const systemPrompt = buildSystemPrompt(profile, sessions, timezone);
 
   const conversationHistory = history
     .reverse()
