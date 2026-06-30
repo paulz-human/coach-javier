@@ -14,6 +14,11 @@ const supabase = createClient(
 );
 
 export async function GET(req: NextRequest) {
+  // Kill switch — set CRON_ENABLED=false in Vercel env vars to pause all emails
+  if (process.env.CRON_ENABLED === "false") {
+    return new Response("Cron paused", { status: 200 });
+  }
+
   // Verify the request comes from Vercel Cron
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
